@@ -18,7 +18,7 @@ class MetroTravel:
         return airports
     
     def load_flights(self, file_path):
-        flights ={}
+        flights = {}
         with open(file_path, 'r') as file:
             for line in file:
                 origin, destination, price = line.strip().split(',')
@@ -45,7 +45,7 @@ class MetroTravel:
             if node in visited:
                 continue
             visited.add(node)
-            path = path + [node]
+            path = path + [node] 
             
             if node == end:
                 return cost, path
@@ -75,7 +75,7 @@ class MetroTravel:
             
             for neighbor, _ in self.adj_list[node]:
                 if has_visa or not self.airports[neighbor][1]:
-                    heapq.heappush(pq, (stops + 1, neighbor, path))
+                    heapq.heappush(pq, (stops + 1 , neighbor, path))
         
         return "No hay ruta disponible."
 
@@ -86,6 +86,7 @@ class MetroTravel:
             return self.find_shortest_route(start, end, has_visa)
         else:
             return "Opción no válida. Elija 'cost' o 'stops'."
+        
 
 
 
@@ -135,31 +136,38 @@ class MetroTravelGUI:
         resultado = self.metro_travel.get_route(origen, destino, tiene_visa, optimizar_por)
 
         self.text_resultado.delete("1.0", tk.END)
-        self.text_resultado.insert(tk.END, str(resultado))
+        # self.text_resultado.insert(tk.END, str(resultado))
 
         if isinstance(resultado, tuple):
-            costo, ruta = resultado
-            self.visualize_route(origen, destino, ruta)
+            if optimizar_por == 'cost':
+                costo, ruta = resultado
+                stops = len(ruta) - 2
+            elif optimizar_por == 'stops':
+                stops, ruta = resultado
+                costo = sum(self.metro_travel.flights[(ruta[i], ruta[i+1])] for i in range(len(ruta)-1))
+                stops -= 1
+                
+            self.visualize_route(origen, destino, ruta, costo, stops)
         else:
             self.clear_plot()
 
-    def visualize_route(self, origen, destino, ruta):
-        G = nx.Graph()
+    def visualize_route(self, origen, destino, ruta, costo, stops):
+        G = nx.DiGraph()
         for airport in self.metro_travel.airports:
             G.add_node(airport)
-        for (o, d), _ in self.metro_travel.flights.items():
+        for o, d in self.metro_travel.flights:
             G.add_edge(o, d)
 
         pos = nx.spring_layout(G)
         plt.figure(figsize=(8, 6))
         nx.draw_networkx_nodes(G, pos, node_color='lightblue')
-        nx.draw_networkx_edges(G, pos)
+        nx.draw_networkx_edges(G, pos, edge_color='#CCCCCC', arrowsize=20, arrowstyle='->')
         nx.draw_networkx_labels(G, pos)
 
         ruta_edges = [(ruta[i], ruta[i+1]) for i in range(len(ruta)-1)]
-        nx.draw_networkx_edges(G, pos, edgelist=ruta_edges, edge_color='red', width=2)
+        nx.draw_networkx_edges(G, pos, edgelist=ruta_edges, edge_color='red', width=2, arrowsize=20, arrowstyle='->')
 
-        plt.title(f"Ruta de {origen} a {destino}")
+        plt.title(f"Ruta de {origen} a {destino} - Precio: ${costo:.2f} - Escalas: {stops}")
         plt.show()
 
     def clear_plot(self):
