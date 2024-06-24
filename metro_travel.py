@@ -18,7 +18,7 @@ class MetroTravel:
         return airports
     
     def load_flights(self, file_path):
-        flights =
+        flights ={}
         with open(file_path, 'r') as file:
             for line in file:
                 origin, destination, price = line.strip().split(',')
