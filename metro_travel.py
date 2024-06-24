@@ -18,7 +18,7 @@ class MetroTravel:
         return airports
     
     def load_flights(self, file_path):
-        flights =
+        flights = {}
         with open(file_path, 'r') as file:
             for line in file:
                 origin, destination, price = line.strip().split(',')
@@ -139,27 +139,27 @@ class MetroTravelGUI:
 
         if isinstance(resultado, tuple):
             costo, ruta = resultado
-            self.visualize_route(origen, destino, ruta)
+            self.visualize_route(origen, destino, ruta, costo)
         else:
             self.clear_plot()
 
-    def visualize_route(self, origen, destino, ruta):
-        G = nx.Graph()
+    def visualize_route(self, origen, destino, ruta, costo):
+        G = nx.DiGraph()
         for airport in self.metro_travel.airports:
             G.add_node(airport)
-        for (o, d), _ in self.metro_travel.flights.items():
+        for o, d in self.metro_travel.flights:
             G.add_edge(o, d)
 
         pos = nx.spring_layout(G)
         plt.figure(figsize=(8, 6))
         nx.draw_networkx_nodes(G, pos, node_color='lightblue')
-        nx.draw_networkx_edges(G, pos)
+        nx.draw_networkx_edges(G, pos, edge_color='#CCCCCC', arrowsize=20, arrowstyle='->')
         nx.draw_networkx_labels(G, pos)
 
         ruta_edges = [(ruta[i], ruta[i+1]) for i in range(len(ruta)-1)]
-        nx.draw_networkx_edges(G, pos, edgelist=ruta_edges, edge_color='red', width=2)
+        nx.draw_networkx_edges(G, pos, edgelist=ruta_edges, edge_color='red', width=2, arrowsize=20, arrowstyle='->')
 
-        plt.title(f"Ruta de {origen} a {destino}")
+        plt.title(f"Ruta de {origen} a {destino} - Costo: ${costo:.2f}")
         plt.show()
 
     def clear_plot(self):
