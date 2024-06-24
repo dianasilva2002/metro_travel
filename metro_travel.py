@@ -138,12 +138,17 @@ class MetroTravelGUI:
         self.text_resultado.insert(tk.END, str(resultado))
 
         if isinstance(resultado, tuple):
-            costo, ruta = resultado
-            self.visualize_route(origen, destino, ruta, costo)
+            if optimizar_por == 'cost':
+                costo, ruta = resultado
+                stops = len(ruta) - 1
+            elif optimizar_por == 'stops':
+                stops, ruta = resultado
+                costo, _ = self.metro_travel.find_cheapest_route(origen, destino, tiene_visa)
+            self.visualize_route(origen, destino, ruta, costo, stops)
         else:
             self.clear_plot()
 
-    def visualize_route(self, origen, destino, ruta, costo):
+    def visualize_route(self, origen, destino, ruta, costo, stops):
         G = nx.DiGraph()
         for airport in self.metro_travel.airports:
             G.add_node(airport)
@@ -159,7 +164,7 @@ class MetroTravelGUI:
         ruta_edges = [(ruta[i], ruta[i+1]) for i in range(len(ruta)-1)]
         nx.draw_networkx_edges(G, pos, edgelist=ruta_edges, edge_color='red', width=2, arrowsize=20, arrowstyle='->')
 
-        plt.title(f"Ruta de {origen} a {destino} - Costo: ${costo:.2f}")
+        plt.title(f"Ruta de {origen} a {destino} - Costo: ${costo:.2f} - Escalas: {stops}")
         plt.show()
 
     def clear_plot(self):
