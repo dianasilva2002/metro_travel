@@ -1,0 +1,11 @@
+CCS,Caracas,No
+AUA,Aruba,Si
+BON,Bonaire,Si
+CUR,Curazao,Si
+SXM,San Martín,Si
+SDQ,Santo Domingo,Si
+SBH,San Bartolomé,No
+POS,Puerto España (Trinidad),No
+BGI,Barbados,No
+FDF,Fort de France (Martinica),No
+PTP,Point a Pitre (Guadalupe),No
