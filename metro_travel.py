@@ -80,15 +80,15 @@ class MetroTravel:
         return "No hay ruta disponible."
 
     def get_route(self, start, end, has_visa, optimize_for):
+        if start not in self.airports or end not in self.airports:
+            return "Origen o destino no válido."
+        
         if optimize_for == 'cost':
             return self.find_cheapest_route(start, end, has_visa)
         elif optimize_for == 'stops':
             return self.find_shortest_route(start, end, has_visa)
         else:
             return "Opción no válida. Elija 'cost' o 'stops'."
-        
-
-
 
 class MetroTravelGUI:
     def __init__(self, master, destinos_file, vuelos_file):
@@ -136,7 +136,6 @@ class MetroTravelGUI:
         resultado = self.metro_travel.get_route(origen, destino, tiene_visa, optimizar_por)
 
         self.text_resultado.delete("1.0", tk.END)
-        # self.text_resultado.insert(tk.END, str(resultado))
 
         if isinstance(resultado, tuple):
             if optimizar_por == 'cost':
@@ -149,6 +148,7 @@ class MetroTravelGUI:
                 
             self.visualize_route(origen, destino, ruta, costo, stops)
         else:
+            self.text_resultado.insert(tk.END, str(resultado))
             self.clear_plot()
 
     def visualize_route(self, origen, destino, ruta, costo, stops):
